@@ -1,7 +1,7 @@
 KrakenD metrics
 ====
 
-A set of building blocks for instrumenting [KakenD](http://www.krakend.io) gateways
+A set of building blocks for instrumenting [KrakenD](http://www.krakend.io) gateways
 
 ## Available middlewares
 
