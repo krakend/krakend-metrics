@@ -66,5 +66,5 @@ func (w *ginResponseWriter) end() {
 	duration := time.Since(w.begin)
 	w.rm.Counter("response", w.name, "status", strconv.Itoa(w.Status()), "count").Inc(1)
 	w.rm.Histogram("response", w.name, "size").Update(int64(w.Size()))
-	w.rm.Timer("response", w.name, "time").Update(duration)
+	w.rm.Histogram("response", w.name, "time").Update(int64(duration))
 }

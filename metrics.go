@@ -65,19 +65,6 @@ func (m *Metrics) TakeSnapshot() Stats {
 				Variance:    metric.Variance(),
 				Percentiles: metric.Percentiles(percentiles),
 			}
-		case metrics.Timer:
-			tmp.Timers[k] = TimerData{
-				Max:         metric.Max(),
-				Min:         metric.Min(),
-				Mean:        metric.Mean(),
-				Stddev:      metric.StdDev(),
-				Variance:    metric.Variance(),
-				Percentiles: metric.Percentiles(percentiles),
-				Rate1:       metric.Rate1(),
-				Rate5:       metric.Rate5(),
-				Rate15:      metric.Rate15(),
-				RateMean:    metric.RateMean(),
-			}
 		}
 	})
 	return tmp

@@ -69,10 +69,6 @@ func TestNew(t *testing.T) {
 		t.Error("expected histogram not present")
 	}
 
-	if _, ok := snapshot.Timers["krakend.router.response./test/{var}.time"]; !ok {
-		t.Error("expected histogram not present")
-	}
-
 	expected = map[string]int64{
 		"krakend.router.connected-gauge":    100,
 		"krakend.router.disconnected-gauge": 100,

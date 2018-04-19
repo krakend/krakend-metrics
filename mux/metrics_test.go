@@ -71,10 +71,6 @@ func TestNew(t *testing.T) {
 		t.Error("expected histogram not present")
 	}
 
-	if _, ok := snapshot.Timers["krakend.router.response./test/{var}.time"]; !ok {
-		t.Error("expected histogram not present")
-	}
-
 	expected = map[string]int64{
 		"krakend.router.connected-gauge":    100,
 		"krakend.router.disconnected-gauge": 100,
@@ -123,15 +119,15 @@ func TestNewHTTPHandler(t *testing.T) {
 	ts.Close()
 
 	expected := map[string]struct{}{
-		"router.connected":                      struct{}{},
-		"router.disconnected":                   struct{}{},
-		"router.connected-gauge":                struct{}{},
-		"router.disconnected-gauge":             struct{}{},
-		"router.connected-total":                struct{}{},
-		"router.disconnected-total":             struct{}{},
-		"router.response.test.status.200.count": struct{}{},
-		"router.response.test.time":             struct{}{},
-		"router.response.test.size":             struct{}{},
+		"router.connected":                      {},
+		"router.disconnected":                   {},
+		"router.connected-gauge":                {},
+		"router.disconnected-gauge":             {},
+		"router.connected-total":                {},
+		"router.disconnected-total":             {},
+		"router.response.test.status.200.count": {},
+		"router.response.test.time":             {},
+		"router.response.test.size":             {},
 	}
 	tracked := []string{}
 	registry.Each(func(k string, _ interface{}) {

@@ -66,8 +66,6 @@ func NewProxyMiddleware(layer, name string, pm *ProxyMetrics) proxy.Middleware {
 				pm.Counter(lvs...).Inc(1)
 				lvs[0] = "latency"
 				pm.Histogram(lvs...).Update(duration)
-				lvs[0] = "latency_t"
-				pm.Timer(lvs...).Update(time.Duration(duration))
 			}(time.Since(begin).Nanoseconds(), resp, err)
 
 			return resp, err
@@ -78,11 +76,6 @@ func NewProxyMiddleware(layer, name string, pm *ProxyMetrics) proxy.Middleware {
 // ProxyMetrics is the metrics collector for the proxy package
 type ProxyMetrics struct {
 	register metrics.Registry
-}
-
-// Timer gets or register a timer
-func (rm *ProxyMetrics) Timer(labels ...string) metrics.Timer {
-	return metrics.GetOrRegisterTimer(strings.Join(labels, "."), rm.register)
 }
 
 // Histogram gets or register a histogram

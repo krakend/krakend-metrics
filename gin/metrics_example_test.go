@@ -125,7 +125,7 @@ func Example_proxy() {
 	// fmt.Println(buf.String())
 
 	// Uncomment the next line and remove the # to see the stats report as the test fails
-	fmt.Println(string(data))
+	// fmt.Println(string(data))
 	// #Output: golly
 
 	// Output:
