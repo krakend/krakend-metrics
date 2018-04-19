@@ -43,8 +43,14 @@ func TestNewProxyMiddleware(t *testing.T) {
 	}
 
 	expected := map[string]struct{}{
-		"proxy.latency.layer.some.name.none.complete.true.error.false":  {},
-		"proxy.requests.layer.some.name.none.complete.true.error.false": {},
+		"proxy.latency.layer.some.name.none.complete.true.error.true":    {},
+		"proxy.latency.layer.some.name.none.complete.true.error.false":   {},
+		"proxy.latency.layer.some.name.none.complete.false.error.true":   {},
+		"proxy.latency.layer.some.name.none.complete.false.error.false":  {},
+		"proxy.requests.layer.some.name.none.complete.true.error.true":   {},
+		"proxy.requests.layer.some.name.none.complete.true.error.false":  {},
+		"proxy.requests.layer.some.name.none.complete.false.error.true":  {},
+		"proxy.requests.layer.some.name.none.complete.false.error.false": {},
 	}
 	tracked := []string{}
 	proxyMetric.register.Each(func(k string, v interface{}) {

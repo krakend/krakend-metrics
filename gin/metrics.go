@@ -42,6 +42,7 @@ func (m *Metrics) NewHTTPHandlerFactory(hf krakendgin.HandlerFactory) krakendgin
 func NewHTTPHandlerFactory(rm *metrics.RouterMetrics, hf krakendgin.HandlerFactory) krakendgin.HandlerFactory {
 	return func(cfg *config.EndpointConfig, p proxy.Proxy) gin.HandlerFunc {
 		next := hf(cfg, p)
+		rm.RegisterResponseWriterMetrics(cfg.Endpoint)
 		return func(c *gin.Context) {
 			rw := &ginResponseWriter{c.Writer, cfg.Endpoint, time.Now(), rm}
 			c.Writer = rw

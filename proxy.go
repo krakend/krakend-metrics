@@ -47,6 +47,7 @@ func NewProxyMetrics(parent *metrics.Registry) *ProxyMetrics {
 
 // NewProxyMiddleware creates a proxy middleware ready to be injected in the pipe as instrumentation point
 func NewProxyMiddleware(layer, name string, pm *ProxyMetrics) proxy.Middleware {
+	registerProxyMiddlewareMetrics(layer, name, pm)
 	return func(next ...proxy.Proxy) proxy.Proxy {
 		if len(next) > 1 {
 			panic(proxy.ErrTooManyProxies)
@@ -56,19 +57,25 @@ func NewProxyMiddleware(layer, name string, pm *ProxyMetrics) proxy.Middleware {
 			resp, err := next[0](ctx, request)
 
 			go func(duration int64, resp *proxy.Response, err error) {
-				lvs := []string{
-					"requests",
-					"layer", layer,
-					"name", name,
-					"complete", strconv.FormatBool(resp != nil && resp.IsComplete),
-					"error", strconv.FormatBool(err != nil),
-				}
-				pm.Counter(lvs...).Inc(1)
-				lvs[0] = "latency"
-				pm.Histogram(lvs...).Update(duration)
+				errored := strconv.FormatBool(err != nil)
+				complete := strconv.FormatBool(resp != nil && resp.IsComplete)
+				labels := "layer." + layer + ".name." + name + ".complete." + complete + ".error." + errored
+				pm.Counter("requests." + labels).Inc(1)
+				pm.Histogram("latency." + labels).Update(duration)
 			}(time.Since(begin).Nanoseconds(), resp, err)
 
 			return resp, err
+		}
+	}
+}
+
+func registerProxyMiddlewareMetrics(layer, name string, pm *ProxyMetrics) {
+	labels := "layer." + layer + ".name." + name
+	for _, complete := range []string{"true", "false"} {
+		for _, errored := range []string{"true", "false"} {
+			metrics.GetOrRegisterCounter("requests."+labels+".complete."+complete+".error."+errored, pm.register)
+
+			metrics.GetOrRegisterHistogram("latency."+labels+".complete."+complete+".error."+errored, pm.register, defaultSample())
 		}
 	}
 }
@@ -80,7 +87,7 @@ type ProxyMetrics struct {
 
 // Histogram gets or register a histogram
 func (rm *ProxyMetrics) Histogram(labels ...string) metrics.Histogram {
-	return metrics.GetOrRegisterHistogram(strings.Join(labels, "."), rm.register, defaultSample)
+	return metrics.GetOrRegisterHistogram(strings.Join(labels, "."), rm.register, defaultSample())
 }
 
 // Counter gets or register a counter

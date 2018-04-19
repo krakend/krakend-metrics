@@ -48,3 +48,10 @@ func (rm *RouterMetrics) Aggregate() {
 	rm.disconnectedTotal.Inc(discon)
 	rm.disconnected.Clear()
 }
+
+func (rm *RouterMetrics) RegisterResponseWriterMetrics(name string) {
+	rm.Counter("response", name, "status")
+
+	rm.Histogram("response", name, "size")
+	rm.Histogram("response", name, "time")
+}

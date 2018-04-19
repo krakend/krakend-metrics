@@ -58,6 +58,7 @@ func TestNew(t *testing.T) {
 		"krakend.router.disconnected":                          0,
 		"krakend.router.connected-total":                       100,
 		"krakend.router.disconnected-total":                    100,
+		"krakend.router.response./test/{var}.status":           0,
 	}
 	for k, v := range snapshot.Counters {
 		if exp, ok := expected[k]; !ok || int(exp) != int(v) {
