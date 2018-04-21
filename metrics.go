@@ -65,6 +65,7 @@ func (m *Metrics) TakeSnapshot() Stats {
 				Variance:    metric.Variance(),
 				Percentiles: metric.Percentiles(percentiles),
 			}
+			metric.Clear()
 		}
 	})
 	return tmp
