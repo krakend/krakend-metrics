@@ -18,6 +18,9 @@ func (m *Metrics) NewProxyMiddleware(layer, name string) proxy.Middleware {
 
 // ProxyFactory creates an instrumented proxy factory
 func (m *Metrics) ProxyFactory(segmentName string, next proxy.Factory) proxy.FactoryFunc {
+	if m.Config == nil || m.Config.ProxyDisabled {
+		return next.New
+	}
 	return proxy.FactoryFunc(func(cfg *config.EndpointConfig) (proxy.Proxy, error) {
 		next, err := next.New(cfg)
 		if err != nil {
@@ -29,6 +32,9 @@ func (m *Metrics) ProxyFactory(segmentName string, next proxy.Factory) proxy.Fac
 
 // BackendFactory creates an instrumented backend factory
 func (m *Metrics) BackendFactory(segmentName string, next proxy.BackendFactory) proxy.BackendFactory {
+	if m.Config == nil || m.Config.BackendDisabled {
+		return next
+	}
 	return func(cfg *config.Backend) proxy.Proxy {
 		return m.NewProxyMiddleware(segmentName, cfg.URLPattern)(next(cfg))
 	}

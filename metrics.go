@@ -10,28 +10,86 @@ import (
 	"strings"
 	"time"
 
+	"github.com/devopsfaith/krakend/config"
 	"github.com/devopsfaith/krakend/logging"
 	"github.com/rcrowley/go-metrics"
 )
 
 // New creates a new metrics producer
-func New(ctx context.Context, d time.Duration, l logging.Logger) *Metrics {
+func New(ctx context.Context, e config.ExtraConfig, l logging.Logger) *Metrics {
 	registry := metrics.NewPrefixedRegistry("krakend.")
 
+	var cfg *Config
+	if tmp, ok := ConfigGetter(e).(*Config); ok {
+		cfg = tmp
+	}
+
 	m := Metrics{
+		Config:         cfg,
 		Router:         NewRouterMetrics(&registry),
 		Proxy:          NewProxyMetrics(&registry),
 		Registry:       &registry,
 		latestSnapshot: NewStats(),
 	}
 
-	m.processMetrics(ctx, d, logger{l})
+	if m.Config != nil {
+		m.processMetrics(ctx, m.Config.CollectionTime, logger{l})
+	}
 
 	return &m
 }
 
+// Namespace is the key to look for extra configuration details
+const Namespace = "github_com/devopsfaith/krakend-metrics"
+
+// Config holds if a component is active or not
+type Config struct {
+	ProxyDisabled   bool `json:"proxy_disabled,omitempty"`
+	RouterDisabled  bool `json:"router_disabled,omitempty"`
+	BackendDisabled bool `json:"backend_disabled,omitempty"`
+	CollectionTime  time.Duration
+}
+
+// ConfigGetter implements the config.ConfigGetter interface. It parses the extra config for the
+// collectors and returns a defaultCfg if something goes wrong.
+func ConfigGetter(e config.ExtraConfig) interface{} {
+	v, ok := e[Namespace]
+	if !ok {
+		return nil
+	}
+
+	tmp, ok := v.(map[string]interface{})
+	if !ok {
+		return nil
+	}
+
+	userCfg := new(Config)
+	userCfg.CollectionTime = time.Minute
+	if collectionTime, ok := tmp["collection_time"]; ok {
+		if d, err := time.ParseDuration(collectionTime.(string)); err == nil {
+			userCfg.CollectionTime = d
+		}
+	}
+	userCfg.ProxyDisabled = getBool(tmp, "proxy_disabled")
+	userCfg.RouterDisabled = getBool(tmp, "router_disabled")
+	userCfg.BackendDisabled = getBool(tmp, "backend_disabled")
+
+	return userCfg
+}
+
+func getBool(data map[string]interface{}, name string) bool {
+	if flag, ok := data[name]; ok {
+		if v, ok := flag.(bool); ok {
+			return v
+		}
+	}
+	return false
+}
+
 // Metrics is the component that manages all the metrics
 type Metrics struct {
+	// Config is the metrics collector configuration
+	Config *Config
 	// Proxy is the metrics collector for the proxy package
 	Proxy *ProxyMetrics
 	// Router is the metrics collector for the router package

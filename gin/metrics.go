@@ -18,8 +18,8 @@ import (
 )
 
 // New creates a new metrics producer with support for the gin router
-func New(ctx context.Context, d time.Duration, l logging.Logger) *Metrics {
-	m := metrics.New(ctx, d, l)
+func New(ctx context.Context, e config.ExtraConfig, l logging.Logger) *Metrics {
+	m := metrics.New(ctx, e, l)
 	return &Metrics{m}
 }
 
@@ -35,6 +35,9 @@ func (m *Metrics) NewExpHandler() gin.HandlerFunc {
 
 // NewHTTPHandlerFactory wraps a handler factory adding some simple instrumentation to the generated handlers
 func (m *Metrics) NewHTTPHandlerFactory(hf krakendgin.HandlerFactory) krakendgin.HandlerFactory {
+	if m.Config == nil || m.Config.RouterDisabled {
+		return hf
+	}
 	return NewHTTPHandlerFactory(m.Router, hf)
 }
 

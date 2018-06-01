@@ -19,8 +19,8 @@ import (
 )
 
 // New creates a new metrics producer with support for the mux router
-func New(ctx context.Context, d time.Duration, l logging.Logger) *Metrics {
-	return &Metrics{krakendmetrics.New(ctx, d, l)}
+func New(ctx context.Context, e config.ExtraConfig, l logging.Logger) *Metrics {
+	return &Metrics{krakendmetrics.New(ctx, e, l)}
 }
 
 // Metrics is the component that manages all the metrics for the mux-based gateways
@@ -39,6 +39,9 @@ func (m *Metrics) NewHTTPHandler(name string, h http.Handler) http.HandlerFunc {
 }
 
 func (m *Metrics) NewHTTPHandlerFactory(defaultHandlerFactory mux.HandlerFactory) mux.HandlerFactory {
+	if m.Config == nil || m.Config.RouterDisabled {
+		return defaultHandlerFactory
+	}
 	return func(cfg *config.EndpointConfig, p proxy.Proxy) http.HandlerFunc {
 		return m.NewHTTPHandler(cfg.Endpoint, defaultHandlerFactory(cfg, p))
 	}
