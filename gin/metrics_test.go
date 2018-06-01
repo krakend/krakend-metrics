@@ -6,9 +6,11 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 	"time"
 
+	metrics "github.com/devopsfaith/krakend-metrics"
 	"github.com/devopsfaith/krakend/config"
 	"github.com/devopsfaith/krakend/logging"
 	"github.com/devopsfaith/krakend/proxy"
@@ -16,14 +18,27 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func TestNew(t *testing.T) {
-	rand.Seed(time.Now().Unix())
-
+func TestDisabledRouterMetrics(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	buf := bytes.NewBuffer(make([]byte, 1024))
 	l, _ := logging.NewLogger("DEBUG", buf, "")
-	metric := New(ctx, 100*time.Millisecond, l)
+	cfg := map[string]interface{}{metrics.Namespace: map[string]interface{}{"router_disabled": true}}
+	metric := New(ctx, cfg, l)
+	hf := metric.NewHTTPHandlerFactory(krakendgin.EndpointHandler)
+	if reflect.ValueOf(hf).Pointer() != reflect.ValueOf(krakendgin.EndpointHandler).Pointer() {
+		t.Error("The endpoint handler should be the default since the Router metrics are disabled.")
+	}
+}
+
+func TestNew(t *testing.T) {
+	rand.Seed(time.Now().Unix())
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	buf := bytes.NewBuffer(make([]byte, 1024))
+	l, _ := logging.NewLogger("DEBUG", buf, "")
+	defaultCfg := map[string]interface{}{metrics.Namespace: map[string]interface{}{"collection_time": "100ms"}}
+	metric := New(ctx, defaultCfg, l)
 
 	engine := gin.New()
 

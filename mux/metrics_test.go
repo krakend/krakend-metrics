@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -19,6 +20,19 @@ import (
 	"github.com/rcrowley/go-metrics"
 )
 
+func TestDisabledRouterMetrics(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	buf := bytes.NewBuffer(make([]byte, 1024))
+	l, _ := logging.NewLogger("DEBUG", buf, "")
+	cfg := map[string]interface{}{krakendmetrics.Namespace: map[string]interface{}{"router_disabled": true}}
+	metric := New(ctx, cfg, l)
+	hf := metric.NewHTTPHandlerFactory(mux.EndpointHandler)
+	if reflect.ValueOf(hf).Pointer() != reflect.ValueOf(mux.EndpointHandler).Pointer() {
+		t.Error("The endpoint handler should be the default since the Router metrics are disabled.")
+	}
+}
+
 func TestNew(t *testing.T) {
 	rand.Seed(time.Now().Unix())
 
@@ -26,7 +40,8 @@ func TestNew(t *testing.T) {
 	defer cancel()
 	buf := bytes.NewBuffer(make([]byte, 1024))
 	l, _ := logging.NewLogger("DEBUG", buf, "")
-	metric := New(ctx, 100*time.Millisecond, l)
+	metricsCfg := map[string]interface{}{krakendmetrics.Namespace: map[string]interface{}{"collection_time": "100ms"}}
+	metric := New(ctx, metricsCfg, l)
 
 	response := proxy.Response{Data: map[string]interface{}{}, IsComplete: true}
 	max := 1000

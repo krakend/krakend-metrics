@@ -1,11 +1,14 @@
 package metrics
 
 import (
+	"bytes"
 	"context"
 	"net/url"
+	"reflect"
 	"testing"
 	"time"
 
+	"github.com/devopsfaith/krakend/logging"
 	"github.com/devopsfaith/krakend/proxy"
 	"github.com/rcrowley/go-metrics"
 )
@@ -16,7 +19,7 @@ func TestNewProxyMiddleware(t *testing.T) {
 	response := &proxy.Response{Data: map[string]interface{}{}, IsComplete: true}
 	assertion := func(_ context.Context, req *proxy.Request) (*proxy.Response, error) {
 		if request != req {
-			t.Errorf("unexpected request! want [%s], have [%s]\n", request, req)
+			t.Errorf("unexpected request! want [%v], have [%v]\n", request, req)
 		}
 		time.Sleep(time.Millisecond)
 		return response, nil
@@ -63,5 +66,18 @@ func TestNewProxyMiddleware(t *testing.T) {
 		if _, ok := expected[k]; !ok {
 			t.Error("the key", k, " has not been tracked")
 		}
+	}
+}
+
+func TestDefaultBackendFactory(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	buf := bytes.NewBuffer(make([]byte, 1024))
+	l, _ := logging.NewLogger("DEBUG", buf, "")
+	cfg := map[string]interface{}{Namespace: map[string]interface{}{"backend_disabled": true}}
+	metric := New(ctx, cfg, l)
+	bf := metric.DefaultBackendFactory()
+	if reflect.ValueOf(bf).Pointer() != reflect.ValueOf(proxy.CustomHTTPProxyFactory(proxy.NewHTTPClient)).Pointer() {
+		t.Error("The backend factory should be the default since the backend metrics are disabled.")
 	}
 }

@@ -11,19 +11,21 @@ import (
 	"strings"
 	"time"
 
+	"github.com/devopsfaith/krakend-metrics"
 	"github.com/devopsfaith/krakend/config"
 	"github.com/devopsfaith/krakend/encoding"
 	"github.com/devopsfaith/krakend/logging"
 	"github.com/devopsfaith/krakend/proxy"
 )
 
+var defaultCfg = map[string]interface{}{metrics.Namespace: map[string]interface{}{"collection_time": "100ms"}}
+
 func Example_router() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	buf := bytes.NewBuffer(make([]byte, 1024))
 	l, _ := logging.NewLogger("DEBUG", buf, "")
-
-	metricProducer := New(ctx, 100*time.Millisecond, l)
+	metricProducer := New(ctx, defaultCfg, l)
 
 	h := metricProducer.NewHTTPHandler("test", http.HandlerFunc(dummyHTTPHandler))
 	ts1 := httptest.NewServer(h)
@@ -75,7 +77,7 @@ func Example_proxy() {
 		Endpoint: "/test/endpoint",
 	}
 
-	metricProducer := New(ctx, 100*time.Millisecond, l)
+	metricProducer := New(ctx, defaultCfg, l)
 
 	response := proxy.Response{Data: map[string]interface{}{}, IsComplete: true}
 	fakeFactory := proxy.FactoryFunc(func(_ *config.EndpointConfig) (proxy.Proxy, error) {
@@ -129,7 +131,7 @@ func Example_backend() {
 	buf := bytes.NewBuffer(make([]byte, 1024))
 	l, _ := logging.NewLogger("DEBUG", buf, "")
 
-	metricProducer := New(ctx, 100*time.Millisecond, l)
+	metricProducer := New(ctx, defaultCfg, l)
 
 	bf := metricProducer.BackendFactory("backend_layer", proxy.CustomHTTPProxyFactory(proxy.NewHTTPClient))
 

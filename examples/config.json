@@ -4,6 +4,11 @@
     "port": 8080,
     "cache_ttl": 3600,
     "timeout": "3s",
+    "extra_config": {
+      "github_com/devopsfaith/krakend-metrics": {
+        "collection_time": "30s"
+      }
+    },
     "endpoints": [
         {
             "endpoint": "/github/{user}",

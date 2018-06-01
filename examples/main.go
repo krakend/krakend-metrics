@@ -5,7 +5,6 @@ import (
 	"flag"
 	"log"
 	"os"
-	"time"
 
 	"github.com/devopsfaith/krakend-viper"
 	"github.com/devopsfaith/krakend/config"
@@ -50,7 +49,7 @@ func main() {
 
 	if *useGorilla {
 
-		metric := metricsmux.New(ctx, time.Minute, logger)
+		metric := metricsmux.New(ctx, serviceConfig.ExtraConfig, logger)
 
 		// create a new proxy factory wrapping an instrumented HTTP backend factory
 		pf := proxy.NewDefaultFactory(metric.DefaultBackendFactory(), logger)
@@ -68,7 +67,7 @@ func main() {
 
 	} else {
 
-		metric := metricsgin.New(ctx, time.Minute, logger)
+		metric := metricsgin.New(ctx, serviceConfig.ExtraConfig, logger)
 
 		// create a new proxy factory wrapping an instrumented HTTP backend factory
 		pf := proxy.NewDefaultFactory(metric.DefaultBackendFactory(), logger)
