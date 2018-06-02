@@ -58,16 +58,6 @@ func (m *Metrics) NewEngine() *gin.Engine {
 	return engine
 }
 
-// func (m *Metrics) RunEndpoint() {
-// 	engine := gin.Default()
-// 	engine.RedirectTrailingSlash = true
-// 	engine.RedirectFixedPath = true
-// 	engine.HandleMethodNotAllowed = true
-//
-// 	engine.GET("/__stats/", gin.WrapH(m.NewExpHandler()))
-// 	go engine.Run(fmt.Sprintf(":%d", m.Config.StatsPort))
-// }
-
 // NewExpHandler creates an http.Handler ready to expose all the collected metrics as a JSON
 func (m *Metrics) NewExpHandler() http.Handler {
 	return NewExpHandler(m.Registry)
