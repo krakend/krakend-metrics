@@ -3,6 +3,8 @@ package mux
 import (
 	"bytes"
 	"context"
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -170,4 +172,51 @@ func TestNewHTTPHandler(t *testing.T) {
 	}
 
 	ts.Close()
+}
+
+func TestDisabledMetricMethods(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	buf := bytes.NewBuffer(make([]byte, 1024))
+	l, _ := logging.NewLogger("DEBUG", buf, "")
+	emptyMetrics := New(ctx, nil, l)
+	hf := emptyMetrics.NewHTTPHandlerFactory(mux.EndpointHandler)
+	if reflect.ValueOf(hf).Pointer() != reflect.ValueOf(mux.EndpointHandler).Pointer() {
+		t.Error("An empty metrics package should implement NewHTTPHandlerFactory method.")
+	}
+	expHandler := emptyMetrics.NewExpHandler()
+	if fmt.Sprintf("%T", expHandler) != "http.HandlerFunc" {
+		t.Error("An empty metrics package should implement the NewExpHandler() method.")
+	}
+	handler := emptyMetrics.NewHTTPHandler("test", http.HandlerFunc(dummyHTTPHandler))
+	if fmt.Sprintf("%T", handler) != "http.HandlerFunc" {
+		t.Error("An empty metrics package should implement the NewExpHandler() method.")
+	}
+
+}
+
+func TestStatsEndpoint(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	buf := bytes.NewBuffer(make([]byte, 1024))
+	l, _ := logging.NewLogger("DEBUG", buf, "")
+	cfg := map[string]interface{}{krakendmetrics.Namespace: map[string]interface{}{"collection_time": "100ms", "stats_port": 8999}}
+	_ = New(ctx, cfg, l)
+	resp, err := http.Get("http://localhost:8999/__stats/")
+	if err != nil {
+		t.Errorf("Problem with the stats endpoint: %s\n", err.Error())
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Errorf("Cannot read body: %s\n", err.Error())
+	}
+	var stats map[string]interface{}
+	err = json.Unmarshal(body, &stats)
+	if err != nil {
+		t.Errorf("Problem unmarshaling stats endpoint response: %s\n", err.Error())
+	}
+	if _, ok := stats["cmdline"]; !ok {
+		t.Error("Key cmdline should exists in the response.\n")
+	}
 }

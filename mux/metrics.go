@@ -1,9 +1,10 @@
-// Package mux defines a set of basic building blocks for instrumenting KakenD gateways built using
+// Package mux defines a set of basic building blocks for instrumenting KrakenD gateways built using
 // the mux router
 package mux
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -12,6 +13,7 @@ import (
 	"github.com/devopsfaith/krakend/logging"
 	"github.com/devopsfaith/krakend/proxy"
 	"github.com/devopsfaith/krakend/router/mux"
+	"github.com/gin-gonic/gin"
 	"github.com/rcrowley/go-metrics"
 	"github.com/rcrowley/go-metrics/exp"
 
@@ -20,13 +22,51 @@ import (
 
 // New creates a new metrics producer with support for the mux router
 func New(ctx context.Context, e config.ExtraConfig, l logging.Logger) *Metrics {
-	return &Metrics{krakendmetrics.New(ctx, e, l)}
+	metricsCollector := Metrics{krakendmetrics.New(ctx, e, l)}
+	if metricsCollector.Config != nil && !metricsCollector.Config.EndpointDisabled {
+		metricsCollector.RunEndpoint(metricsCollector.NewEngine(), l)
+	}
+	return &metricsCollector
 }
 
 // Metrics is the component that manages all the metrics for the mux-based gateways
 type Metrics struct {
 	*krakendmetrics.Metrics
 }
+
+// RunEndpoint runs the *gin.Engine (that should have the stats endpoint) with the logger
+func (m *Metrics) RunEndpoint(e *gin.Engine, l logging.Logger) {
+	s := &http.Server{
+		Addr:    fmt.Sprintf(":%d", m.Config.StatsPort),
+		Handler: e,
+	}
+	go func() {
+		l.Critical(s.ListenAndServe())
+	}()
+}
+
+// NewEngine returns a *gin.Engine with some defaults and the stats endpoint (no logger)
+func (m *Metrics) NewEngine() *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
+	engine := gin.New()
+	engine.Use(gin.Recovery())
+	engine.RedirectTrailingSlash = true
+	engine.RedirectFixedPath = true
+	engine.HandleMethodNotAllowed = true
+
+	engine.GET("/__stats/", gin.WrapH(m.NewExpHandler()))
+	return engine
+}
+
+// func (m *Metrics) RunEndpoint() {
+// 	engine := gin.Default()
+// 	engine.RedirectTrailingSlash = true
+// 	engine.RedirectFixedPath = true
+// 	engine.HandleMethodNotAllowed = true
+//
+// 	engine.GET("/__stats/", gin.WrapH(m.NewExpHandler()))
+// 	go engine.Run(fmt.Sprintf(":%d", m.Config.StatsPort))
+// }
 
 // NewExpHandler creates an http.Handler ready to expose all the collected metrics as a JSON
 func (m *Metrics) NewExpHandler() http.Handler {

@@ -1,9 +1,11 @@
-// Package gin defines a set of basic building blocks for instrumenting KakenD gateways built using
+// Package gin defines a set of basic building blocks for instrumenting KrakenD gateways built using
 // the gin router
 package gin
 
 import (
 	"context"
+	"fmt"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -19,13 +21,40 @@ import (
 
 // New creates a new metrics producer with support for the gin router
 func New(ctx context.Context, e config.ExtraConfig, l logging.Logger) *Metrics {
-	m := metrics.New(ctx, e, l)
-	return &Metrics{m}
+	metricsCollector := Metrics{metrics.New(ctx, e, l)}
+	if metricsCollector.Config != nil && !metricsCollector.Config.EndpointDisabled {
+		metricsCollector.RunEndpoint(metricsCollector.NewEngine(), l)
+	}
+	return &metricsCollector
 }
 
 // Metrics is the component that manages all the metrics for the gin-based gateways
 type Metrics struct {
 	*metrics.Metrics
+}
+
+// RunEndpoint runs the *gin.Engine (that should have the stats endpoint) with the logger
+func (m *Metrics) RunEndpoint(e *gin.Engine, l logging.Logger) {
+	s := &http.Server{
+		Addr:    fmt.Sprintf(":%d", m.Config.StatsPort),
+		Handler: e,
+	}
+	go func() {
+		l.Critical(s.ListenAndServe())
+	}()
+}
+
+// NewEngine returns a *gin.Engine with some defaults and the stats endpoint (no logger)
+func (m *Metrics) NewEngine() *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
+	engine := gin.New()
+	engine.Use(gin.Recovery())
+	engine.RedirectTrailingSlash = true
+	engine.RedirectFixedPath = true
+	engine.HandleMethodNotAllowed = true
+
+	engine.GET("/__stats/", m.NewExpHandler())
+	return engine
 }
 
 // NewExpHandler creates an http.Handler ready to expose all the collected metrics as a JSON
