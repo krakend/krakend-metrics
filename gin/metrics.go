@@ -4,8 +4,6 @@ package gin
 
 import (
 	"context"
-	"fmt"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -23,7 +21,7 @@ import (
 func New(ctx context.Context, e config.ExtraConfig, l logging.Logger) *Metrics {
 	metricsCollector := Metrics{metrics.New(ctx, e, l)}
 	if metricsCollector.Config != nil && !metricsCollector.Config.EndpointDisabled {
-		metricsCollector.RunEndpoint(metricsCollector.NewEngine(), l)
+		metricsCollector.RunEndpoint(ctx, metricsCollector.NewEngine(), l)
 	}
 	return &metricsCollector
 }
@@ -34,14 +32,14 @@ type Metrics struct {
 }
 
 // RunEndpoint runs the *gin.Engine (that should have the stats endpoint) with the logger
-func (m *Metrics) RunEndpoint(e *gin.Engine, l logging.Logger) {
-	s := &http.Server{
-		Addr:    fmt.Sprintf(":%d", m.Config.StatsPort),
-		Handler: e,
-	}
-	go func() {
-		l.Critical(s.ListenAndServe())
-	}()
+func (m *Metrics) RunEndpoint(ctx context.Context, e *gin.Engine, l logging.Logger) {
+	statsFactory := krakendgin.NewFactory(krakendgin.Config{
+		Engine: e,
+		Logger: l,
+	})
+	go statsFactory.NewWithContext(ctx).Run(config.ServiceConfig{
+		Port: m.Config.StatsPort,
+	})
 }
 
 // NewEngine returns a *gin.Engine with some defaults and the stats endpoint (no logger)
