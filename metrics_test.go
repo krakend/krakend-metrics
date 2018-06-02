@@ -18,6 +18,7 @@ func TestConfigGetter(t *testing.T) {
 			"proxy_disabled":  true,
 			"router_disabled": true,
 			"collection_time": "100ms",
+			"stats_port":      8888,
 		},
 	}
 	testCfg := ConfigGetter(sampleCfg).(*Config)
@@ -32,6 +33,9 @@ func TestConfigGetter(t *testing.T) {
 	}
 	if testCfg.CollectionTime != 100*time.Millisecond {
 		t.Errorf("Unexpected collection time: %v", testCfg.CollectionTime)
+	}
+	if testCfg.StatsPort != 8888 {
+		t.Errorf("Unexpected port: %d", testCfg.StatsPort)
 	}
 }
 
@@ -62,6 +66,26 @@ func TestNoConfiguration(t *testing.T) {
 	testCfg := ConfigGetter(noCfg)
 	if nil != testCfg {
 		t.Error("The config should be nil (disabled middleware).")
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	buf := bytes.NewBuffer(make([]byte, 1024))
+	l, _ := logging.NewLogger("DEBUG", buf, "")
+	m := New(ctx, nil, l)
+	stats1 := m.Snapshot()
+	time.Sleep(100 * time.Millisecond)
+	stats2 := m.Snapshot()
+
+	if stats1.Time > stats2.Time {
+		t.Error("the later stat must have a higher timestamp")
+		return
+	}
+	// sleep some time so the producer is able to collect some logs
+	time.Sleep(200 * time.Millisecond)
+	lines := len(strings.Split(buf.String(), "\n"))
+	if lines != 1 {
+		t.Error("unexpected log size. got:", lines)
 	}
 }
 
