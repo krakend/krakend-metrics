@@ -60,7 +60,7 @@ func (m *Metrics) NewEngine() *gin.Engine {
 	engine.RedirectFixedPath = true
 	engine.HandleMethodNotAllowed = true
 
-	engine.GET("/__stats/", m.NewExpHandler())
+	engine.GET("/__stats", m.NewExpHandler())
 	return engine
 }
 

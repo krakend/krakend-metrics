@@ -12,7 +12,6 @@ import (
 	"github.com/devopsfaith/krakend/logging"
 	"github.com/devopsfaith/krakend/proxy"
 	"github.com/devopsfaith/krakend/router/mux"
-	"github.com/gin-gonic/gin"
 	"github.com/rcrowley/go-metrics"
 	"github.com/rcrowley/go-metrics/exp"
 
@@ -34,10 +33,10 @@ type Metrics struct {
 }
 
 // RunEndpoint runs the *gin.Engine (that should have the stats endpoint) with the logger
-func (m *Metrics) RunEndpoint(ctx context.Context, e *gin.Engine, l logging.Logger) {
+func (m *Metrics) RunEndpoint(ctx context.Context, s *http.ServeMux, l logging.Logger) {
 	server := &http.Server{
 		Addr:    m.Config.ListenAddr,
-		Handler: e,
+		Handler: s,
 	}
 	go func() {
 		l.Error(server.ListenAndServe())
@@ -52,17 +51,11 @@ func (m *Metrics) RunEndpoint(ctx context.Context, e *gin.Engine, l logging.Logg
 	}()
 }
 
-// NewEngine returns a *gin.Engine with some defaults and the stats endpoint (no logger)
-func (m *Metrics) NewEngine() *gin.Engine {
-	gin.SetMode(gin.ReleaseMode)
-	engine := gin.New()
-	engine.Use(gin.Recovery())
-	engine.RedirectTrailingSlash = true
-	engine.RedirectFixedPath = true
-	engine.HandleMethodNotAllowed = true
-
-	engine.GET("/__stats/", gin.WrapH(m.NewExpHandler()))
-	return engine
+// NewEngine returns a *http.ServeMux with the stats endpoint (no logger)
+func (m *Metrics) NewEngine() *http.ServeMux {
+	mux := http.NewServeMux()
+	mux.Handle("/__stats", m.NewExpHandler())
+	return mux
 }
 
 // NewExpHandler creates an http.Handler ready to expose all the collected metrics as a JSON
