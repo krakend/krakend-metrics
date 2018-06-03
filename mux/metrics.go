@@ -1,4 +1,4 @@
-// Package mux defines a set of basic building blocks for instrumenting KakenD gateways built using
+// Package mux defines a set of basic building blocks for instrumenting KrakenD gateways built using
 // the mux router
 package mux
 
@@ -20,12 +20,42 @@ import (
 
 // New creates a new metrics producer with support for the mux router
 func New(ctx context.Context, e config.ExtraConfig, l logging.Logger) *Metrics {
-	return &Metrics{krakendmetrics.New(ctx, e, l)}
+	metricsCollector := Metrics{krakendmetrics.New(ctx, e, l)}
+	if metricsCollector.Config != nil && !metricsCollector.Config.EndpointDisabled {
+		metricsCollector.RunEndpoint(ctx, metricsCollector.NewEngine(), l)
+	}
+	return &metricsCollector
 }
 
 // Metrics is the component that manages all the metrics for the mux-based gateways
 type Metrics struct {
 	*krakendmetrics.Metrics
+}
+
+// RunEndpoint runs the *gin.Engine (that should have the stats endpoint) with the logger
+func (m *Metrics) RunEndpoint(ctx context.Context, s *http.ServeMux, l logging.Logger) {
+	server := &http.Server{
+		Addr:    m.Config.ListenAddr,
+		Handler: s,
+	}
+	go func() {
+		l.Error(server.ListenAndServe())
+	}()
+
+	go func() {
+		<-ctx.Done()
+		l.Info("shutting down the stats handler")
+		ctx, cancel := context.WithTimeout(ctx, time.Second)
+		server.Shutdown(ctx)
+		cancel()
+	}()
+}
+
+// NewEngine returns a *http.ServeMux with the stats endpoint (no logger)
+func (m *Metrics) NewEngine() *http.ServeMux {
+	mux := http.NewServeMux()
+	mux.Handle("/__stats", m.NewExpHandler())
+	return mux
 }
 
 // NewExpHandler creates an http.Handler ready to expose all the collected metrics as a JSON

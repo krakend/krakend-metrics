@@ -1,4 +1,4 @@
-// Package metrics defines a set of basic building blocks for instrumenting KakenD gateways
+// Package metrics defines a set of basic building blocks for instrumenting KrakenD gateways
 //
 // Check the "github.com/devopsfaith/krakend-metrics/gin" and "github.com/devopsfaith/krakend-metrics/mux"
 // packages for complete implementations
@@ -15,6 +15,9 @@ import (
 	"github.com/rcrowley/go-metrics"
 )
 
+// defaultListenAddrt is the default listen address:port for the stats endpoint service
+var defaultListenAddr = ":8090"
+
 // New creates a new metrics producer
 func New(ctx context.Context, e config.ExtraConfig, l logging.Logger) *Metrics {
 	registry := metrics.NewPrefixedRegistry("krakend.")
@@ -22,6 +25,15 @@ func New(ctx context.Context, e config.ExtraConfig, l logging.Logger) *Metrics {
 	var cfg *Config
 	if tmp, ok := ConfigGetter(e).(*Config); ok {
 		cfg = tmp
+	}
+
+	if cfg == nil {
+		registry = NewDummyRegistry()
+		return &Metrics{
+			Registry: &registry,
+			Router:   &RouterMetrics{},
+			Proxy:    &ProxyMetrics{},
+		}
 	}
 
 	m := Metrics{
@@ -32,9 +44,7 @@ func New(ctx context.Context, e config.ExtraConfig, l logging.Logger) *Metrics {
 		latestSnapshot: NewStats(),
 	}
 
-	if m.Config != nil {
-		m.processMetrics(ctx, m.Config.CollectionTime, logger{l})
-	}
+	m.processMetrics(ctx, m.Config.CollectionTime, logger{l})
 
 	return &m
 }
@@ -44,10 +54,12 @@ const Namespace = "github_com/devopsfaith/krakend-metrics"
 
 // Config holds if a component is active or not
 type Config struct {
-	ProxyDisabled   bool `json:"proxy_disabled,omitempty"`
-	RouterDisabled  bool `json:"router_disabled,omitempty"`
-	BackendDisabled bool `json:"backend_disabled,omitempty"`
-	CollectionTime  time.Duration
+	ProxyDisabled    bool
+	RouterDisabled   bool
+	BackendDisabled  bool
+	CollectionTime   time.Duration
+	ListenAddr       string
+	EndpointDisabled bool
 }
 
 // ConfigGetter implements the config.ConfigGetter interface. It parses the extra config for the
@@ -70,9 +82,16 @@ func ConfigGetter(e config.ExtraConfig) interface{} {
 			userCfg.CollectionTime = d
 		}
 	}
+	userCfg.ListenAddr = defaultListenAddr
+	if listenAddr, ok := tmp["listen_address"]; ok {
+		if a, ok := listenAddr.(string); ok {
+			userCfg.ListenAddr = a
+		}
+	}
 	userCfg.ProxyDisabled = getBool(tmp, "proxy_disabled")
 	userCfg.RouterDisabled = getBool(tmp, "router_disabled")
 	userCfg.BackendDisabled = getBool(tmp, "backend_disabled")
+	userCfg.EndpointDisabled = getBool(tmp, "endpoint_disabled")
 
 	return userCfg
 }
@@ -164,4 +183,22 @@ type logger struct {
 
 func (l logger) Printf(format string, v ...interface{}) {
 	l.logger.Debug(strings.TrimRight(fmt.Sprintf(format, v...), "\n"))
+}
+
+// DummyRegistry implements the rcrowley/go-metrics.Registry interface
+type DummyRegistry struct{}
+
+func (r DummyRegistry) Each(_ func(string, interface{})) {}
+func (r DummyRegistry) Get(_ string) interface{}         { return nil }
+func (r DummyRegistry) GetAll() map[string]map[string]interface{} {
+	return map[string]map[string]interface{}{}
+}
+func (r DummyRegistry) GetOrRegister(_ string, i interface{}) interface{} { return i }
+func (r DummyRegistry) Register(_ string, _ interface{}) error            { return nil }
+func (r DummyRegistry) RunHealthchecks()                                  {}
+func (r DummyRegistry) Unregister(_ string)                               {}
+func (r DummyRegistry) UnregisterAll()                                    {}
+
+func NewDummyRegistry() metrics.Registry {
+	return DummyRegistry{}
 }

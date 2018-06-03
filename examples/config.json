@@ -6,7 +6,8 @@
     "timeout": "3s",
     "extra_config": {
       "github_com/devopsfaith/krakend-metrics": {
-        "collection_time": "30s"
+        "collection_time": "30s",
+        "listen_address": "127.0.0.1:8090"
       }
     },
     "endpoints": [

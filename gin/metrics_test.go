@@ -3,6 +3,8 @@ package gin
 import (
 	"bytes"
 	"context"
+	"encoding/json"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -56,7 +58,7 @@ func TestNew(t *testing.T) {
 		CacheTTL: time.Second,
 	}
 	engine.GET("/test/:var", hf(cfg, p))
-	engine.GET("/__stats", metric.NewExpHandler())
+	statsEngine := metric.NewEngine()
 
 	for i := 0; i < 100; i++ {
 		w := httptest.NewRecorder()
@@ -97,9 +99,35 @@ func TestNew(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/__stats", nil)
-	engine.ServeHTTP(w, req)
+	statsEngine.ServeHTTP(w, req)
 
 	if w.Result().StatusCode != 200 {
 		t.Errorf("unexpected status code: %d\n", w.Result().StatusCode)
+	}
+}
+
+func TestStatsEndpoint(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	buf := bytes.NewBuffer(make([]byte, 1024))
+	l, _ := logging.NewLogger("DEBUG", buf, "")
+	cfg := map[string]interface{}{metrics.Namespace: map[string]interface{}{"collection_time": "100ms", "listen_address": ":8999"}}
+	_ = New(ctx, cfg, l)
+	resp, err := http.Get("http://localhost:8999/__stats")
+	if err != nil {
+		t.Errorf("Problem with the stats endpoint: %s\n", err.Error())
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Errorf("Cannot read body: %s\n", err.Error())
+	}
+	var stats map[string]interface{}
+	err = json.Unmarshal(body, &stats)
+	if err != nil {
+		t.Errorf("Proble unmarshaling stats endpoint response: %s\n", err.Error())
+	}
+	if _, ok := stats["cmdline"]; !ok {
+		t.Error("Key cmdline should exists in the response.\n")
 	}
 }

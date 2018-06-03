@@ -60,8 +60,6 @@ func main() {
 		// declare the instrumented router handler
 		routerCfg.HandlerFactory = metric.NewHTTPHandlerFactory(defaultHandlerFactory)
 		routerFactory := mux.NewFactory(routerCfg)
-		// register the stats endpoint
-		routerCfg.Engine.Handle("/__stats/", metric.NewExpHandler())
 
 		routerFactory.NewWithContext(ctx).Run(serviceConfig)
 
@@ -83,10 +81,7 @@ func main() {
 			Middlewares: []gin.HandlerFunc{},
 			Logger:      logger,
 		})
-		// register the stats endpoint
-		engine.GET("/__stats/", metric.NewExpHandler())
 
 		routerFactory.NewWithContext(ctx).Run(serviceConfig)
-
 	}
 }
