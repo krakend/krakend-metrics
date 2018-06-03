@@ -18,7 +18,7 @@ func TestConfigGetter(t *testing.T) {
 			"proxy_disabled":  true,
 			"router_disabled": true,
 			"collection_time": "100ms",
-			"stats_port":      8888,
+			"listen_address":  "192.168.1.1:8888",
 		},
 	}
 	testCfg := ConfigGetter(sampleCfg).(*Config)
@@ -34,8 +34,8 @@ func TestConfigGetter(t *testing.T) {
 	if testCfg.CollectionTime != 100*time.Millisecond {
 		t.Errorf("Unexpected collection time: %v", testCfg.CollectionTime)
 	}
-	if testCfg.StatsPort != 8888 {
-		t.Errorf("Unexpected port: %d", testCfg.StatsPort)
+	if testCfg.ListenAddr != "192.168.1.1:8888" {
+		t.Errorf("Unexpected addr: %s", testCfg.ListenAddr)
 	}
 }
 

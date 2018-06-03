@@ -200,7 +200,7 @@ func TestStatsEndpoint(t *testing.T) {
 	defer cancel()
 	buf := bytes.NewBuffer(make([]byte, 1024))
 	l, _ := logging.NewLogger("DEBUG", buf, "")
-	cfg := map[string]interface{}{krakendmetrics.Namespace: map[string]interface{}{"collection_time": "100ms", "stats_port": 8999}}
+	cfg := map[string]interface{}{krakendmetrics.Namespace: map[string]interface{}{"collection_time": "100ms", "listen_address": ":8999"}}
 	_ = New(ctx, cfg, l)
 	resp, err := http.Get("http://localhost:8999/__stats/")
 	if err != nil {

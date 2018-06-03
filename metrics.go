@@ -15,7 +15,8 @@ import (
 	"github.com/rcrowley/go-metrics"
 )
 
-var defaultStatsPort int = 8090
+// defaultListenAddrt is the default listen address:port for the stats endpoint service
+var defaultListenAddr = ":8090"
 
 // New creates a new metrics producer
 func New(ctx context.Context, e config.ExtraConfig, l logging.Logger) *Metrics {
@@ -57,7 +58,7 @@ type Config struct {
 	RouterDisabled   bool
 	BackendDisabled  bool
 	CollectionTime   time.Duration
-	StatsPort        int
+	ListenAddr       string
 	EndpointDisabled bool
 }
 
@@ -81,10 +82,10 @@ func ConfigGetter(e config.ExtraConfig) interface{} {
 			userCfg.CollectionTime = d
 		}
 	}
-	userCfg.StatsPort = defaultStatsPort
-	if statsPort, ok := tmp["stats_port"]; ok {
-		if p, ok := statsPort.(int); ok {
-			userCfg.StatsPort = p
+	userCfg.ListenAddr = defaultListenAddr
+	if listenAddr, ok := tmp["listen_address"]; ok {
+		if a, ok := listenAddr.(string); ok {
+			userCfg.ListenAddr = a
 		}
 	}
 	userCfg.ProxyDisabled = getBool(tmp, "proxy_disabled")
@@ -184,6 +185,7 @@ func (l logger) Printf(format string, v ...interface{}) {
 	l.logger.Debug(strings.TrimRight(fmt.Sprintf(format, v...), "\n"))
 }
 
+// DummyRegistry implements the rcrowley/go-metrics.Registry interface
 type DummyRegistry struct{}
 
 func (r DummyRegistry) Each(_ func(string, interface{})) {}
