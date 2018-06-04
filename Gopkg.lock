@@ -9,14 +9,16 @@
     "encoding",
     "logging",
     "proxy",
+    "register",
+    "register/internal",
     "router",
     "router/gin",
     "router/gorilla",
     "router/mux",
     "sd"
   ]
-  revision = "f7f27225f65abd50ae1ef168970649f8fab3fbf3"
-  version = "0.4.2"
+  revision = "a9119126330c3d376857bdd6ec05c57c2dea670b"
+  version = "0.5"
 
 [[projects]]
   branch = "master"
@@ -187,6 +189,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8e22e6571f903d76c2afef5d7fcce074024a67866ac5730fe9270a7cafc5a06d"
+  inputs-digest = "2782fd25403d5a8b65d616d992a887000cc108cbdc2cc12c3fb08911e2dcbf72"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -5,7 +5,6 @@ import (
 	"flag"
 	"log"
 	"os"
-	"time"
 
 	"github.com/devopsfaith/krakend-viper"
 	"github.com/devopsfaith/krakend/config"
@@ -50,7 +49,7 @@ func main() {
 
 	if *useGorilla {
 
-		metric := metricsmux.New(ctx, time.Minute, logger)
+		metric := metricsmux.New(ctx, serviceConfig.ExtraConfig, logger)
 
 		// create a new proxy factory wrapping an instrumented HTTP backend factory
 		pf := proxy.NewDefaultFactory(metric.DefaultBackendFactory(), logger)
@@ -61,14 +60,12 @@ func main() {
 		// declare the instrumented router handler
 		routerCfg.HandlerFactory = metric.NewHTTPHandlerFactory(defaultHandlerFactory)
 		routerFactory := mux.NewFactory(routerCfg)
-		// register the stats endpoint
-		routerCfg.Engine.Handle("/__stats/", metric.NewExpHandler())
 
 		routerFactory.NewWithContext(ctx).Run(serviceConfig)
 
 	} else {
 
-		metric := metricsgin.New(ctx, time.Minute, logger)
+		metric := metricsgin.New(ctx, serviceConfig.ExtraConfig, logger)
 
 		// create a new proxy factory wrapping an instrumented HTTP backend factory
 		pf := proxy.NewDefaultFactory(metric.DefaultBackendFactory(), logger)
@@ -84,10 +81,7 @@ func main() {
 			Middlewares: []gin.HandlerFunc{},
 			Logger:      logger,
 		})
-		// register the stats endpoint
-		engine.GET("/__stats/", metric.NewExpHandler())
 
 		routerFactory.NewWithContext(ctx).Run(serviceConfig)
-
 	}
 }
