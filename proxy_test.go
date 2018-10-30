@@ -10,6 +10,7 @@ import (
 
 	"github.com/devopsfaith/krakend/logging"
 	"github.com/devopsfaith/krakend/proxy"
+	"github.com/devopsfaith/krakend/transport/http/client"
 	"github.com/rcrowley/go-metrics"
 )
 
@@ -77,7 +78,7 @@ func TestDefaultBackendFactory(t *testing.T) {
 	cfg := map[string]interface{}{Namespace: map[string]interface{}{"backend_disabled": true}}
 	metric := New(ctx, cfg, l)
 	bf := metric.DefaultBackendFactory()
-	if reflect.ValueOf(bf).Pointer() != reflect.ValueOf(proxy.CustomHTTPProxyFactory(proxy.NewHTTPClient)).Pointer() {
+	if reflect.ValueOf(bf).Pointer() != reflect.ValueOf(proxy.CustomHTTPProxyFactory(client.NewHTTPClient)).Pointer() {
 		t.Error("The backend factory should be the default since the backend metrics are disabled.")
 	}
 }

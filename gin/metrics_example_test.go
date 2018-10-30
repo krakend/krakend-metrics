@@ -14,6 +14,7 @@ import (
 	metrics "github.com/devopsfaith/krakend-metrics"
 	"github.com/devopsfaith/krakend/config"
 	"github.com/devopsfaith/krakend/encoding"
+	"github.com/devopsfaith/krakend/transport/http/client"
 	"github.com/devopsfaith/krakend/logging"
 	"github.com/devopsfaith/krakend/proxy"
 	"github.com/gin-gonic/gin"
@@ -141,7 +142,7 @@ func Example_backend() {
 
 	metricProducer := New(ctx, defaultCfg, l)
 
-	bf := metricProducer.BackendFactory("backend_layer", proxy.CustomHTTPProxyFactory(proxy.NewHTTPClient))
+	bf := metricProducer.BackendFactory("backend_layer", proxy.CustomHTTPProxyFactory(client.NewHTTPClient))
 
 	p := bf(&config.Backend{URLPattern: "/some/{url}", Decoder: encoding.JSONDecoder})
 
