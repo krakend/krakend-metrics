@@ -8,6 +8,7 @@ import (
 
 	"github.com/devopsfaith/krakend/config"
 	"github.com/devopsfaith/krakend/proxy"
+	"github.com/devopsfaith/krakend/transport/http/client"
 	"github.com/rcrowley/go-metrics"
 )
 
@@ -42,7 +43,7 @@ func (m *Metrics) BackendFactory(segmentName string, next proxy.BackendFactory) 
 
 // DefaultBackendFactory creates an instrumented default HTTP backend factory
 func (m *Metrics) DefaultBackendFactory() proxy.BackendFactory {
-	return m.BackendFactory("backend", proxy.CustomHTTPProxyFactory(proxy.NewHTTPClient))
+	return m.BackendFactory("backend", proxy.CustomHTTPProxyFactory(client.NewHTTPClient))
 }
 
 // NewProxyMetrics creates a ProxyMetrics using the injected registry
