@@ -15,8 +15,8 @@ import (
 	"github.com/devopsfaith/krakend/config"
 	"github.com/devopsfaith/krakend/encoding"
 	"github.com/devopsfaith/krakend/logging"
-	"github.com/devopsfaith/krakend/transport/http/client"
 	"github.com/devopsfaith/krakend/proxy"
+	"github.com/devopsfaith/krakend/transport/http/client"
 )
 
 var defaultCfg = map[string]interface{}{metrics.Namespace: map[string]interface{}{"collection_time": "100ms"}}

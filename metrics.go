@@ -154,8 +154,6 @@ func (m *Metrics) processMetrics(ctx context.Context, d time.Duration, l metrics
 	metrics.RegisterDebugGCStats(r)
 	metrics.RegisterRuntimeMemStats(r)
 
-	go metrics.Log(r, d, l)
-
 	go func() {
 		ticker := time.NewTicker(d)
 		for {
