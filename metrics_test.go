@@ -119,8 +119,8 @@ func TestBadConfiguration(t *testing.T) {
 func TestMetrics(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	buf := bytes.NewBuffer(make([]byte, 1024))
-	l, _ := logging.NewLogger("DEBUG", buf, "")
+
+	l, _ := logging.NewLogger("DEBUG", new(bytes.Buffer), "")
 	cfg := map[string]interface{}{Namespace: map[string]interface{}{"collection_time": "100ms"}}
 	m := New(ctx, cfg, l)
 	stats1 := m.Snapshot()
@@ -130,12 +130,6 @@ func TestMetrics(t *testing.T) {
 	if stats1.Time > stats2.Time {
 		t.Error("the later stat must have a higher timestamp")
 		return
-	}
-	// sleep some time so the producer is able to collect some logs
-	time.Sleep(200 * time.Millisecond)
-	lines := len(strings.Split(buf.String(), "\n"))
-	if lines < 50 {
-		t.Error("unexpected log size. got:", lines)
 	}
 }
 
