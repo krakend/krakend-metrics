@@ -19,7 +19,7 @@ import (
 	"github.com/devopsfaith/krakend/logging"
 	"github.com/devopsfaith/krakend/proxy"
 	"github.com/devopsfaith/krakend/router/mux"
-	"github.com/rcrowley/go-metrics"
+	metrics "github.com/rcrowley/go-metrics"
 )
 
 func TestDisabledRouterMetrics(t *testing.T) {
@@ -202,6 +202,7 @@ func TestStatsEndpoint(t *testing.T) {
 	l, _ := logging.NewLogger("DEBUG", buf, "")
 	cfg := map[string]interface{}{krakendmetrics.Namespace: map[string]interface{}{"collection_time": "100ms", "listen_address": ":8999"}}
 	_ = New(ctx, cfg, l)
+	<-time.After(500 * time.Millisecond)
 	resp, err := http.Get("http://localhost:8999/__stats")
 	if err != nil {
 		t.Errorf("Problem with the stats endpoint: %s\n", err.Error())
