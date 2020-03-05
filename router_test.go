@@ -1,26 +1,27 @@
 package metrics
 
 import (
+	"crypto/tls"
 	"strings"
 	"testing"
 
-	"github.com/rcrowley/go-metrics"
+	metrics "github.com/rcrowley/go-metrics"
 )
 
 func TestRouterMetrics(t *testing.T) {
 	p := metrics.NewRegistry()
 	rm := NewRouterMetrics(&p)
 
-	rm.Connection()
-	rm.Connection()
+	rm.Connection(nil)
+	rm.Connection(&tls.ConnectionState{Version: tls.VersionTLS13, CipherSuite: tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256})
 	rm.Disconnection()
-	rm.Connection()
-	rm.Connection()
-	rm.Connection()
+	rm.Connection(nil)
+	rm.Connection(nil)
+	rm.Connection(nil)
 
 	rm.Aggregate()
 
-	rm.Connection()
+	rm.Connection(&tls.ConnectionState{Version: tls.VersionTLS12, CipherSuite: tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA})
 	rm.Disconnection()
 	rm.Disconnection()
 	rm.Disconnection()
@@ -42,6 +43,10 @@ func TestRouterMetrics(t *testing.T) {
 		"router.disconnected-total": 4,
 		"router.connected-gauge":    1,
 		"router.disconnected-gauge": 3,
+		"router.tls_cipher.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256.count": 1,
+		"router.tls_cipher.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA.count":            1,
+		"router.tls_version.VersionTLS13.count":                                 1,
+		"router.tls_version.VersionTLS12.count":                                 1,
 	} {
 		var have int64
 		switch metric := p.Get(k).(type) {
