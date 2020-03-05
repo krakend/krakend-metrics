@@ -13,7 +13,7 @@ func TestRouterMetrics(t *testing.T) {
 	rm := NewRouterMetrics(&p)
 
 	rm.Connection(nil)
-	rm.Connection(&tls.ConnectionState{Version: tls.VersionTLS13, CipherSuite: tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256})
+	rm.Connection(&tls.ConnectionState{Version: tls.VersionTLS11, CipherSuite: tls.TLS_RSA_WITH_AES_128_GCM_SHA256})
 	rm.Disconnection()
 	rm.Connection(nil)
 	rm.Connection(nil)
@@ -37,16 +37,16 @@ func TestRouterMetrics(t *testing.T) {
 	})
 
 	for k, want := range map[string]int64{
-		"router.connected":          0,
-		"router.disconnected":       1,
-		"router.connected-total":    6,
-		"router.disconnected-total": 4,
-		"router.connected-gauge":    1,
-		"router.disconnected-gauge": 3,
-		"router.tls_cipher.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256.count": 1,
-		"router.tls_cipher.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA.count":            1,
-		"router.tls_version.VersionTLS13.count":                                 1,
-		"router.tls_version.VersionTLS12.count":                                 1,
+		"router.connected":                                           0,
+		"router.disconnected":                                        1,
+		"router.connected-total":                                     6,
+		"router.disconnected-total":                                  4,
+		"router.connected-gauge":                                     1,
+		"router.disconnected-gauge":                                  3,
+		"router.tls_cipher.TLS_RSA_WITH_AES_128_GCM_SHA256.count":    1,
+		"router.tls_cipher.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA.count": 1,
+		"router.tls_version.VersionTLS11.count":                      1,
+		"router.tls_version.VersionTLS12.count":                      1,
 	} {
 		var have int64
 		switch metric := p.Get(k).(type) {
