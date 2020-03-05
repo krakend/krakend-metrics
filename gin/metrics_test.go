@@ -111,12 +111,13 @@ func TestStatsEndpoint(t *testing.T) {
 	defer cancel()
 	buf := bytes.NewBuffer(make([]byte, 1024))
 	l, _ := logging.NewLogger("DEBUG", buf, "")
-	cfg := map[string]interface{}{metrics.Namespace: map[string]interface{}{"collection_time": "100ms", "listen_address": ":8999"}}
+	cfg := map[string]interface{}{metrics.Namespace: map[string]interface{}{"collection_time": "100ms", "listen_address": ":8990"}}
 	_ = New(ctx, cfg, l)
 	<-time.After(500 * time.Millisecond)
-	resp, err := http.Get("http://localhost:8999/__stats")
+	resp, err := http.Get("http://localhost:8990/__stats")
 	if err != nil {
 		t.Errorf("Problem with the stats endpoint: %s\n", err.Error())
+		return
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)

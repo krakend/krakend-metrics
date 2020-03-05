@@ -206,6 +206,7 @@ func TestStatsEndpoint(t *testing.T) {
 	resp, err := http.Get("http://localhost:8999/__stats")
 	if err != nil {
 		t.Errorf("Problem with the stats endpoint: %s\n", err.Error())
+		return
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
