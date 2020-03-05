@@ -86,7 +86,7 @@ func NewExpHandler(parent *metrics.Registry) http.Handler {
 func NewHTTPHandler(name string, h http.Handler, rm *krakendmetrics.RouterMetrics) http.HandlerFunc {
 	rm.RegisterResponseWriterMetrics(name)
 	return func(w http.ResponseWriter, r *http.Request) {
-		rm.Connection()
+		rm.Connection(r.TLS)
 		rw := newHTTPResponseWriter(name, w, rm)
 		h.ServeHTTP(rw, r)
 		rw.end()

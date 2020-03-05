@@ -85,7 +85,7 @@ func NewHTTPHandlerFactory(rm *metrics.RouterMetrics, hf krakendgin.HandlerFacto
 		return func(c *gin.Context) {
 			rw := &ginResponseWriter{c.Writer, cfg.Endpoint, time.Now(), rm}
 			c.Writer = rw
-			rm.Connection()
+			rm.Connection(c.Request.TLS)
 
 			next(c)
 

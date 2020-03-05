@@ -1,6 +1,10 @@
 package metrics
 
-import "github.com/rcrowley/go-metrics"
+import (
+	"crypto/tls"
+
+	metrics "github.com/rcrowley/go-metrics"
+)
 
 // NewRouterMetrics creates a RouterMetrics using the injected registry
 func NewRouterMetrics(parent *metrics.Registry) *RouterMetrics {
@@ -29,8 +33,14 @@ type RouterMetrics struct {
 }
 
 // Connection adds one to the internal connected counter
-func (rm *RouterMetrics) Connection() {
+func (rm *RouterMetrics) Connection(TLS *tls.ConnectionState) {
 	rm.connected.Inc(1)
+	if TLS == nil {
+		return
+	}
+
+	rm.Counter("tls_version", tlsVersion[TLS.Version], "count").Inc(1)
+	rm.Counter("tls_cipher", tlsCipherSuite[TLS.CipherSuite], "count").Inc(1)
 }
 
 // Disconnection adds one to the internal disconnected counter
