@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/devopsfaith/krakend/logging"
-	"github.com/devopsfaith/krakend/proxy"
-	"github.com/devopsfaith/krakend/transport/http/client"
+	"github.com/luraproject/lura/logging"
+	"github.com/luraproject/lura/proxy"
+	"github.com/luraproject/lura/transport/http/client"
 	"github.com/rcrowley/go-metrics"
 )
 

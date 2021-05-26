@@ -8,13 +8,13 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/devopsfaith/krakend/config"
-	"github.com/devopsfaith/krakend/logging"
-	"github.com/devopsfaith/krakend/proxy"
-	krakendgin "github.com/devopsfaith/krakend/router/gin"
 	"github.com/gin-gonic/gin"
+	"github.com/luraproject/lura/config"
+	"github.com/luraproject/lura/logging"
+	"github.com/luraproject/lura/proxy"
+	krakendgin "github.com/luraproject/lura/router/gin"
 
-	"github.com/devopsfaith/krakend-metrics"
+	metrics "github.com/devopsfaith/krakend-metrics"
 	"github.com/devopsfaith/krakend-metrics/mux"
 )
 

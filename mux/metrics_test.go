@@ -15,10 +15,10 @@ import (
 	"time"
 
 	krakendmetrics "github.com/devopsfaith/krakend-metrics"
-	"github.com/devopsfaith/krakend/config"
-	"github.com/devopsfaith/krakend/logging"
-	"github.com/devopsfaith/krakend/proxy"
-	"github.com/devopsfaith/krakend/router/mux"
+	"github.com/luraproject/lura/config"
+	"github.com/luraproject/lura/logging"
+	"github.com/luraproject/lura/proxy"
+	"github.com/luraproject/lura/router/mux"
 	metrics "github.com/rcrowley/go-metrics"
 )
 
@@ -42,7 +42,7 @@ func TestNew(t *testing.T) {
 	defer cancel()
 	buf := bytes.NewBuffer(make([]byte, 1024))
 	l, _ := logging.NewLogger("DEBUG", buf, "")
-	metricsCfg := map[string]interface{}{krakendmetrics.Namespace: map[string]interface{}{"collection_time": "100ms"}}
+	metricsCfg := map[string]interface{}{krakendmetrics.Namespace: map[string]interface{}{"collection_time": "1s"}}
 	metric := New(ctx, metricsCfg, l)
 
 	response := proxy.Response{Data: map[string]interface{}{}, IsComplete: true}
