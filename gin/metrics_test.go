@@ -13,11 +13,11 @@ import (
 	"time"
 
 	metrics "github.com/devopsfaith/krakend-metrics"
-	"github.com/devopsfaith/krakend/config"
-	"github.com/devopsfaith/krakend/logging"
-	"github.com/devopsfaith/krakend/proxy"
-	krakendgin "github.com/devopsfaith/krakend/router/gin"
 	"github.com/gin-gonic/gin"
+	"github.com/luraproject/lura/config"
+	"github.com/luraproject/lura/logging"
+	"github.com/luraproject/lura/proxy"
+	krakendgin "github.com/luraproject/lura/router/gin"
 )
 
 func TestDisabledRouterMetrics(t *testing.T) {
@@ -39,7 +39,7 @@ func TestNew(t *testing.T) {
 	defer cancel()
 	buf := bytes.NewBuffer(make([]byte, 1024))
 	l, _ := logging.NewLogger("DEBUG", buf, "")
-	defaultCfg := map[string]interface{}{metrics.Namespace: map[string]interface{}{"collection_time": "100ms"}}
+	defaultCfg := map[string]interface{}{metrics.Namespace: map[string]interface{}{"collection_time": "1s"}}
 	metric := New(ctx, defaultCfg, l)
 
 	engine := gin.New()

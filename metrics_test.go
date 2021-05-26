@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/devopsfaith/krakend/logging"
+	"github.com/luraproject/lura/logging"
 	"github.com/rcrowley/go-metrics"
 )
 
