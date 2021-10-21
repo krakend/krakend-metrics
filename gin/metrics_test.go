@@ -12,12 +12,12 @@ import (
 	"testing"
 	"time"
 
-	metrics "github.com/devopsfaith/krakend-metrics"
+	metrics "github.com/devopsfaith/krakend-metrics/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/luraproject/lura/config"
-	"github.com/luraproject/lura/logging"
-	"github.com/luraproject/lura/proxy"
-	krakendgin "github.com/luraproject/lura/router/gin"
+	"github.com/luraproject/lura/v2/config"
+	"github.com/luraproject/lura/v2/logging"
+	"github.com/luraproject/lura/v2/proxy"
+	krakendgin "github.com/luraproject/lura/v2/router/gin"
 )
 
 func TestDisabledRouterMetrics(t *testing.T) {

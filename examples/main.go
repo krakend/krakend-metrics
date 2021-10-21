@@ -6,17 +6,17 @@ import (
 	"log"
 	"os"
 
-	viper "github.com/devopsfaith/krakend-viper"
+	viper "github.com/devopsfaith/krakend-viper/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/luraproject/lura/config"
-	"github.com/luraproject/lura/logging"
-	"github.com/luraproject/lura/proxy"
-	krakendgin "github.com/luraproject/lura/router/gin"
-	"github.com/luraproject/lura/router/gorilla"
-	"github.com/luraproject/lura/router/mux"
+	"github.com/luraproject/lura/v2/config"
+	"github.com/luraproject/lura/v2/logging"
+	"github.com/luraproject/lura/v2/proxy"
+	krakendgin "github.com/luraproject/lura/v2/router/gin"
+	"github.com/luraproject/lura/v2/router/gorilla"
+	"github.com/luraproject/lura/v2/router/mux"
 
-	metricsgin "github.com/devopsfaith/krakend-metrics/gin"
-	metricsmux "github.com/devopsfaith/krakend-metrics/mux"
+	metricsgin "github.com/devopsfaith/krakend-metrics/v2/gin"
+	metricsmux "github.com/devopsfaith/krakend-metrics/v2/mux"
 )
 
 func main() {
