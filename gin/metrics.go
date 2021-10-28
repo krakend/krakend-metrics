@@ -34,21 +34,26 @@ type Metrics struct {
 
 // RunEndpoint runs the *gin.Engine (that should have the stats endpoint) with the logger
 func (m *Metrics) RunEndpoint(ctx context.Context, e *gin.Engine, l logging.Logger) {
+	logPrefix := "[SERVICE: Stats]"
 	server := &http.Server{
 		Addr:    m.Config.ListenAddr,
 		Handler: e,
 	}
 	go func() {
-		l.Error(server.ListenAndServe())
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			l.Error(logPrefix, err.Error())
+		}
 	}()
 
 	go func() {
 		<-ctx.Done()
-		l.Info("shutting down the stats handler")
+		l.Info(logPrefix, "Shutting down the metrics endpoint handler")
 		ctx, cancel := context.WithTimeout(ctx, time.Second)
 		server.Shutdown(ctx)
 		cancel()
 	}()
+
+	l.Debug(logPrefix, "The endpoint /__stats is now available on", m.Config.ListenAddr)
 }
 
 // NewEngine returns a *gin.Engine with some defaults and the stats endpoint (no logger)
