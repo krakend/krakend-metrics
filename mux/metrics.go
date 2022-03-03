@@ -8,14 +8,14 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/luraproject/lura/config"
-	"github.com/luraproject/lura/logging"
-	"github.com/luraproject/lura/proxy"
-	"github.com/luraproject/lura/router/mux"
+	"github.com/luraproject/lura/v2/config"
+	"github.com/luraproject/lura/v2/logging"
+	"github.com/luraproject/lura/v2/proxy"
+	"github.com/luraproject/lura/v2/router/mux"
 	"github.com/rcrowley/go-metrics"
 	"github.com/rcrowley/go-metrics/exp"
 
-	krakendmetrics "github.com/devopsfaith/krakend-metrics"
+	krakendmetrics "github.com/devopsfaith/krakend-metrics/v2"
 )
 
 // New creates a new metrics producer with support for the mux router
