@@ -3,9 +3,9 @@ module github.com/devopsfaith/krakend-metrics/v2
 go 1.17
 
 require (
-	github.com/devopsfaith/krakend-viper/v2 v2.0.0-20211020152843-fef58b415f68
-	github.com/gin-gonic/gin v1.7.4
-	github.com/luraproject/lura/v2 v2.0.0-dev
+	github.com/devopsfaith/krakend-viper/v2 v2.0.0
+	github.com/gin-gonic/gin v1.7.7
+	github.com/luraproject/lura/v2 v2.0.0
 	github.com/rcrowley/go-metrics v0.0.0-20180406234716-d932a24a8ccb
 )
 
@@ -36,6 +36,7 @@ require (
 	github.com/ugorji/go/codec v1.2.6 // indirect
 	github.com/valyala/fastrand v1.1.0 // indirect
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20211004093028-2c5d950f24ef // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
