@@ -19,7 +19,7 @@
                         "https://api.github.com"
                     ],
                     "url_pattern": "/",
-                    "whitelist": [
+                    "allow": [
                         "authorizations_url",
                         "code_search_url"
                     ]
