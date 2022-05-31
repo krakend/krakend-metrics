@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	metrics "github.com/devopsfaith/krakend-metrics/v2"
 	"github.com/gin-gonic/gin"
+	metrics "github.com/krakendio/krakend-metrics/v2"
 	"github.com/luraproject/lura/v2/config"
 	"github.com/luraproject/lura/v2/logging"
 	"github.com/luraproject/lura/v2/proxy"

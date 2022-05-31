@@ -1,4 +1,4 @@
-module github.com/devopsfaith/krakend-metrics/v2
+module github.com/krakendio/krakend-metrics/v2
 
 go 1.17
 

@@ -15,8 +15,8 @@ import (
 	"github.com/luraproject/lura/v2/router/gorilla"
 	"github.com/luraproject/lura/v2/router/mux"
 
-	metricsgin "github.com/devopsfaith/krakend-metrics/v2/gin"
-	metricsmux "github.com/devopsfaith/krakend-metrics/v2/mux"
+	metricsgin "github.com/krakendio/krakend-metrics/v2/gin"
+	metricsmux "github.com/krakendio/krakend-metrics/v2/mux"
 )
 
 func main() {

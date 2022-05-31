@@ -14,8 +14,8 @@ import (
 	"github.com/luraproject/lura/v2/proxy"
 	krakendgin "github.com/luraproject/lura/v2/router/gin"
 
-	metrics "github.com/devopsfaith/krakend-metrics/v2"
-	"github.com/devopsfaith/krakend-metrics/v2/mux"
+	metrics "github.com/krakendio/krakend-metrics/v2"
+	"github.com/krakendio/krakend-metrics/v2/mux"
 )
 
 // New creates a new metrics producer with support for the gin router
