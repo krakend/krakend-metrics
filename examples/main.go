@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	viper "github.com/devopsfaith/krakend-viper/v2"
 	"github.com/gin-gonic/gin"
+	viper "github.com/krakendio/krakend-viper/v2"
 	"github.com/luraproject/lura/v2/config"
 	"github.com/luraproject/lura/v2/logging"
 	"github.com/luraproject/lura/v2/proxy"

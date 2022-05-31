@@ -3,7 +3,7 @@ module github.com/krakendio/krakend-metrics/v2
 go 1.17
 
 require (
-	github.com/devopsfaith/krakend-viper/v2 v2.0.0
+	github.com/krakendio/krakend-viper/v2 v2.0.0
 	github.com/gin-gonic/gin v1.7.7
 	github.com/luraproject/lura/v2 v2.0.0
 	github.com/rcrowley/go-metrics v0.0.0-20180406234716-d932a24a8ccb
