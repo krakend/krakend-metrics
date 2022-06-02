@@ -192,7 +192,6 @@ func TestDisabledMetricMethods(t *testing.T) {
 	if fmt.Sprintf("%T", handler) != "http.HandlerFunc" {
 		t.Error("An empty metrics package should implement the NewExpHandler() method.")
 	}
-
 }
 
 func TestStatsEndpoint(t *testing.T) {
