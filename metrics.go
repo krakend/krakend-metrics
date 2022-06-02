@@ -186,16 +186,16 @@ func (l logger) Printf(format string, v ...interface{}) {
 // DummyRegistry implements the rcrowley/go-metrics.Registry interface
 type DummyRegistry struct{}
 
-func (r DummyRegistry) Each(_ func(string, interface{})) {}
-func (r DummyRegistry) Get(_ string) interface{}         { return nil }
-func (r DummyRegistry) GetAll() map[string]map[string]interface{} {
+func (DummyRegistry) Each(_ func(string, interface{})) {}
+func (DummyRegistry) Get(_ string) interface{}         { return nil }
+func (DummyRegistry) GetAll() map[string]map[string]interface{} {
 	return map[string]map[string]interface{}{}
 }
-func (r DummyRegistry) GetOrRegister(_ string, i interface{}) interface{} { return i }
-func (r DummyRegistry) Register(_ string, _ interface{}) error            { return nil }
-func (r DummyRegistry) RunHealthchecks()                                  {}
-func (r DummyRegistry) Unregister(_ string)                               {}
-func (r DummyRegistry) UnregisterAll()                                    {}
+func (DummyRegistry) GetOrRegister(_ string, i interface{}) interface{} { return i }
+func (DummyRegistry) Register(_ string, _ interface{}) error            { return nil }
+func (DummyRegistry) RunHealthchecks()                                  {}
+func (DummyRegistry) Unregister(_ string)                               {}
+func (DummyRegistry) UnregisterAll()                                    {}
 
 func NewDummyRegistry() metrics.Registry {
 	return DummyRegistry{}
