@@ -167,6 +167,6 @@ type customLogger struct {
 	called *bool
 }
 
-func (l customLogger) Printf(format string, v ...interface{}) {
+func (l customLogger) Printf(_ string, _ ...interface{}) {
 	*(l.called) = true
 }

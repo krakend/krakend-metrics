@@ -186,7 +186,7 @@ func Example_backend() {
 	// Output:
 }
 
-func dummyHTTPHandler(w http.ResponseWriter, r *http.Request) {
+func dummyHTTPHandler(w http.ResponseWriter, _ *http.Request) {
 	time.Sleep(time.Millisecond)
 	w.Header().Set("x-test", "ok")
 	w.Header().Set("content-type", "application/json")
