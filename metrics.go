@@ -148,7 +148,7 @@ func (m *Metrics) TakeSnapshot() Stats {
 	return tmp
 }
 
-func (m *Metrics) processMetrics(ctx context.Context, d time.Duration, l metrics.Logger) {
+func (m *Metrics) processMetrics(ctx context.Context, d time.Duration, _ metrics.Logger) {
 	r := metrics.NewPrefixedChildRegistry(*(m.Registry), "service.")
 
 	metrics.RegisterDebugGCStats(r)
