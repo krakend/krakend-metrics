@@ -48,7 +48,8 @@ func TestNew(t *testing.T) {
 	max := 1000
 	min := 1
 	p := func(_ context.Context, _ *proxy.Request) (*proxy.Response, error) {
-		time.Sleep(time.Microsecond * time.Duration(rand.Intn(max-min)+min))
+		// we do not need crypto strong rand generator for this
+		time.Sleep(time.Microsecond * time.Duration(rand.Intn(max-min)+min)) // skipcq: GSC-G404
 		return &response, nil
 	}
 	hf := metric.NewHTTPHandlerFactory(krakendgin.EndpointHandler)
