@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -36,7 +36,9 @@ func TestDisabledRouterMetrics(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	rand.Seed(time.Now().Unix())
+	// we do not need a lot of entropy for the test, so we comment
+	// the line to skip the warning
+	rand.Seed(time.Now().Unix()) // skipcq: GO-S1033
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -65,7 +67,7 @@ func TestNew(t *testing.T) {
 
 	for i := 0; i < 100; i++ {
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/test/something", ioutil.NopCloser(strings.NewReader("")))
+		req, _ := http.NewRequest("GET", "/test/something", io.NopCloser(strings.NewReader("")))
 		hf(cfg, p)(w, req)
 	}
 
@@ -101,7 +103,7 @@ func TestNew(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/__stats", ioutil.NopCloser(strings.NewReader("")))
+	req, _ := http.NewRequest("GET", "/__stats", io.NopCloser(strings.NewReader("")))
 	metric.NewExpHandler().ServeHTTP(w, req)
 
 	if w.Result().StatusCode != 200 {
@@ -113,7 +115,7 @@ func TestNewHTTPHandler(t *testing.T) {
 	registry := metrics.NewRegistry()
 
 	rm := krakendmetrics.NewRouterMetrics(&registry)
-	assertion := func(w http.ResponseWriter, r *http.Request) {
+	assertion := func(w http.ResponseWriter, _ *http.Request) {
 		time.Sleep(time.Millisecond)
 		w.Header().Set("x-test", "ok")
 		w.WriteHeader(200)
@@ -149,7 +151,7 @@ func TestNewHTTPHandler(t *testing.T) {
 		"router.response.test.size":             {},
 		"router.response.test.status":           {},
 	}
-	tracked := []string{}
+	tracked := make([]string, 0, len(expected))
 	registry.Each(func(k string, _ interface{}) {
 		tracked = append(tracked, k)
 	})
@@ -208,17 +210,20 @@ func TestStatsEndpoint(t *testing.T) {
 		t.Errorf("Problem with the stats endpoint: %s\n", err.Error())
 		return
 	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf("Cannot read body: %s\n", err.Error())
+		return
 	}
+	_ = resp.Body.Close()
 	var stats map[string]interface{}
 	err = json.Unmarshal(body, &stats)
 	if err != nil {
 		t.Errorf("Problem unmarshaling stats endpoint response: %s\n", err.Error())
+		return
 	}
 	if _, ok := stats["cmdline"]; !ok {
 		t.Error("Key cmdline should exists in the response.\n")
+		return
 	}
 }

@@ -52,8 +52,8 @@ func TestNewProxyMiddleware(t *testing.T) {
 		"proxy.requests.layer.some.name.none.complete.false.error.true":  {},
 		"proxy.requests.layer.some.name.none.complete.false.error.false": {},
 	}
-	tracked := []string{}
-	proxyMetric.register.Each(func(k string, v interface{}) {
+	tracked := make([]string, 0, len(expected))
+	proxyMetric.register.Each(func(k string, _ interface{}) {
 		tracked = append(tracked, k)
 	})
 	if len(tracked) != len(expected) {
