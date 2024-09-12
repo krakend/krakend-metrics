@@ -3,9 +3,9 @@ module github.com/krakendio/krakend-metrics/v2
 go 1.19
 
 require (
-	github.com/gin-gonic/gin v1.10.0
+	github.com/gin-gonic/gin v1.9.1
 	github.com/krakendio/krakend-viper/v2 v2.0.1
-	github.com/luraproject/lura/v2 v2.0.5
+	github.com/luraproject/lura/v2 v2.7.0
 	github.com/rcrowley/go-metrics v0.0.0-20180406234716-d932a24a8ccb
 )
 
