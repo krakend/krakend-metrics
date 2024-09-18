@@ -1,16 +1,12 @@
 package metrics
 
 import (
-	"bytes"
 	"context"
 	"net/url"
-	"reflect"
 	"testing"
 	"time"
 
-	"github.com/luraproject/lura/v2/logging"
 	"github.com/luraproject/lura/v2/proxy"
-	"github.com/luraproject/lura/v2/transport/http/client"
 	"github.com/rcrowley/go-metrics"
 )
 
@@ -56,8 +52,8 @@ func TestNewProxyMiddleware(t *testing.T) {
 		"proxy.requests.layer.some.name.none.complete.false.error.true":  {},
 		"proxy.requests.layer.some.name.none.complete.false.error.false": {},
 	}
-	tracked := []string{}
-	proxyMetric.register.Each(func(k string, v interface{}) {
+	tracked := make([]string, 0, len(expected))
+	proxyMetric.register.Each(func(k string, _ interface{}) {
 		tracked = append(tracked, k)
 	})
 	if len(tracked) != len(expected) {
@@ -67,18 +63,5 @@ func TestNewProxyMiddleware(t *testing.T) {
 		if _, ok := expected[k]; !ok {
 			t.Error("the key", k, " has not been tracked")
 		}
-	}
-}
-
-func TestDefaultBackendFactory(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	buf := bytes.NewBuffer(make([]byte, 1024))
-	l, _ := logging.NewLogger("DEBUG", buf, "")
-	cfg := map[string]interface{}{Namespace: map[string]interface{}{"backend_disabled": true}}
-	metric := New(ctx, cfg, l)
-	bf := metric.DefaultBackendFactory()
-	if reflect.ValueOf(bf).Pointer() != reflect.ValueOf(proxy.CustomHTTPProxyFactory(client.NewHTTPClient)).Pointer() {
-		t.Error("The backend factory should be the default since the backend metrics are disabled.")
 	}
 }

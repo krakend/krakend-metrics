@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -34,7 +34,9 @@ func TestDisabledRouterMetrics(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	rand.Seed(time.Now().Unix())
+	// we do not need a lot of entropy for the test, so we comment
+	// the line to skip the warning
+	rand.Seed(time.Now().Unix()) // skipcq: GO-S1033
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	buf := bytes.NewBuffer(make([]byte, 1024))
@@ -48,7 +50,8 @@ func TestNew(t *testing.T) {
 	max := 1000
 	min := 1
 	p := func(_ context.Context, _ *proxy.Request) (*proxy.Response, error) {
-		time.Sleep(time.Microsecond * time.Duration(rand.Intn(max-min)+min))
+		// we do not need crypto strong rand generator for this
+		time.Sleep(time.Microsecond * time.Duration(rand.Intn(max-min)+min)) // skipcq: GSC-G404
 		return &response, nil
 	}
 	hf := metric.NewHTTPHandlerFactory(krakendgin.EndpointHandler)
@@ -119,17 +122,20 @@ func TestStatsEndpoint(t *testing.T) {
 		t.Errorf("Problem with the stats endpoint: %s\n", err.Error())
 		return
 	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Errorf("Cannot read body: %s\n", err.Error())
+		return
 	}
+	_ = resp.Body.Close()
 	var stats map[string]interface{}
 	err = json.Unmarshal(body, &stats)
 	if err != nil {
 		t.Errorf("Proble unmarshaling stats endpoint response: %s\n", err.Error())
+		return
 	}
 	if _, ok := stats["cmdline"]; !ok {
 		t.Error("Key cmdline should exists in the response.\n")
+		return
 	}
 }
