@@ -36,8 +36,9 @@ type Metrics struct {
 func (m *Metrics) RunEndpoint(ctx context.Context, e *gin.Engine, l logging.Logger) {
 	logPrefix := "[SERVICE: Stats]"
 	server := &http.Server{
-		Addr:    m.Config.ListenAddr,
-		Handler: e,
+		Addr:              m.Config.ListenAddr,
+		Handler:           e,
+		ReadHeaderTimeout: 3 * time.Second,
 	}
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {

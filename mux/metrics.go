@@ -35,8 +35,9 @@ type Metrics struct {
 // RunEndpoint runs the *gin.Engine (that should have the stats endpoint) with the logger
 func (m *Metrics) RunEndpoint(ctx context.Context, s *http.ServeMux, l logging.Logger) {
 	server := &http.Server{
-		Addr:    m.Config.ListenAddr,
-		Handler: s,
+		Addr:              m.Config.ListenAddr,
+		Handler:           s,
+		ReadHeaderTimeout: 3 * time.Second,
 	}
 	go func() {
 		l.Error(server.ListenAndServe())
