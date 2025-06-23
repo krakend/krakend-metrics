@@ -136,7 +136,7 @@ func (w *responseWriter) Flush() {
 	}
 }
 
-func (w responseWriter) end() {
+func (w *responseWriter) end() {
 	duration := time.Since(w.begin)
 	w.rm.Counter("response", w.name, "status", strconv.Itoa(w.status), "count").Inc(1)
 	w.rm.Histogram("response", w.name, "size").Update(int64(w.responseSize))
