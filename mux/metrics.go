@@ -127,6 +127,15 @@ func (w *responseWriter) Write(data []byte) (i int, err error) {
 	return
 }
 
+// Flush implementes the http.Flush interface
+func (w *responseWriter) Flush() {
+	// TODO: check if we use the Lura's flush extractor
+	// in transport/http
+	if f, ok := w.ResponseWriter.(http.Flusher); ok {
+		f.Flush()
+	}
+}
+
 func (w responseWriter) end() {
 	duration := time.Since(w.begin)
 	w.rm.Counter("response", w.name, "status", strconv.Itoa(w.status), "count").Inc(1)
