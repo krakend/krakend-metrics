@@ -3,7 +3,10 @@
 package mux
 
 import (
+	"bufio"
 	"context"
+	"errors"
+	"net"
 	"net/http"
 	"strconv"
 	"time"
@@ -127,7 +130,26 @@ func (w *responseWriter) Write(data []byte) (i int, err error) {
 	return
 }
 
-func (w responseWriter) end() {
+var _ http.Flusher = (*responseWriter)(nil)
+
+// Flush implements the http.Flush interface
+func (w *responseWriter) Flush() {
+	if f, ok := w.ResponseWriter.(http.Flusher); ok {
+		f.Flush()
+	}
+}
+
+var _ http.Hijacker = (*responseWriter)(nil)
+
+// Hijack implements the http.Hijacker interface
+func (w *responseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	if h, ok := w.ResponseWriter.(http.Hijacker); ok {
+		return h.Hijack()
+	}
+	return nil, nil, errors.New("not supported")
+}
+
+func (w *responseWriter) end() {
 	duration := time.Since(w.begin)
 	w.rm.Counter("response", w.name, "status", strconv.Itoa(w.status), "count").Inc(1)
 	w.rm.Histogram("response", w.name, "size").Update(int64(w.responseSize))
