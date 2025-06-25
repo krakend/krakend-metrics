@@ -127,13 +127,23 @@ func (w *responseWriter) Write(data []byte) (i int, err error) {
 	return
 }
 
-// Flush implementes the http.Flush interface
+var _ http.Flusher = (*responseWriter)(nil)
+
+// Flush implements the http.Flush interface
 func (w *responseWriter) Flush() {
-	// TODO: check if we use the Lura's flush extractor
-	// in transport/http
 	if f, ok := w.ResponseWriter.(http.Flusher); ok {
 		f.Flush()
 	}
+}
+
+var _ http.Hijacker = (*responseWriter)(nil)
+
+// Hijack implements the http.Hijacker interface
+func (w *responseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	if h, ok := w.ResponseWriter.(http.Hijacker); ok {
+		return h.Hijack()
+	}
+	return nil, nil, errors.New("not supported")
 }
 
 func (w *responseWriter) end() {
