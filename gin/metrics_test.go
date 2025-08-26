@@ -47,11 +47,11 @@ func TestNew(t *testing.T) {
 	engine := gin.New()
 
 	response := proxy.Response{Data: map[string]interface{}{}, IsComplete: true}
-	max := 1000
-	min := 1
+	dMax := 1000
+	dMin := 1
 	p := func(_ context.Context, _ *proxy.Request) (*proxy.Response, error) {
 		// we do not need crypto strong rand generator for this
-		time.Sleep(time.Microsecond * time.Duration(rand.Intn(max-min)+min)) // skipcq: GSC-G404
+		time.Sleep(time.Microsecond * time.Duration(rand.Intn(dMax-dMin)+dMin)) // skipcq: GSC-G404
 		return &response, nil
 	}
 	hf := metric.NewHTTPHandlerFactory(krakendgin.EndpointHandler)
@@ -65,7 +65,7 @@ func TestNew(t *testing.T) {
 
 	for i := 0; i < 100; i++ {
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("GET", "/test/a", nil)
+		req, _ := http.NewRequest("GET", "/test/a", http.NoBody)
 		engine.ServeHTTP(w, req)
 	}
 
@@ -101,7 +101,7 @@ func TestNew(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/__stats", nil)
+	req, _ := http.NewRequest("GET", "/__stats", http.NoBody)
 	statsEngine.ServeHTTP(w, req)
 
 	if w.Result().StatusCode != 200 {
