@@ -18,7 +18,7 @@ import (
 	"github.com/rcrowley/go-metrics"
 	"github.com/rcrowley/go-metrics/exp"
 
-	krakendmetrics "github.com/krakendio/krakend-metrics/v2"
+	krakendmetrics "github.com/krakend/krakend-metrics/v2"
 )
 
 // New creates a new metrics producer with support for the mux router
