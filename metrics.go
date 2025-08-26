@@ -1,6 +1,6 @@
 // Package metrics defines a set of basic building blocks for instrumenting KrakenD gateways
 //
-// Check the "github.com/krakendio/krakend-metrics/gin" and "github.com/krakendio/krakend-metrics/mux"
+// Check the "github.com/krakend/krakend-metrics/gin" and "github.com/krakend/krakend-metrics/mux"
 // packages for complete implementations
 package metrics
 
