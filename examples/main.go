@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	viper "github.com/krakend/krakend-viper/v2"
+	koanf "github.com/krakend/krakend-koanf"
 	"github.com/luraproject/lura/v2/config"
 	"github.com/luraproject/lura/v2/logging"
 	"github.com/luraproject/lura/v2/proxy"
@@ -30,7 +30,7 @@ func main() {
 	if *useGorilla {
 		config.RoutingPattern = config.BracketsRouterPatternBuilder
 	}
-	parser := viper.New()
+	parser := koanf.New()
 	serviceConfig, err := parser.Parse(*configFile)
 	if err != nil {
 		log.Fatal("ERROR:", err.Error())
