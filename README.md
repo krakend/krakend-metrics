@@ -37,7 +37,7 @@ Or configure the collection time of metrics:
 This configuration will set the _collection time_ to 2 minutes and will disable the proxy metrics collector (backend and router metrics will be enabled since the default for all layers is to be enabled).
 ```
   "extra_config": {
-    "github_com/devopsfaith/krakend-metrics": {
+    "telemetry/metrics": {
       "collection_time": "2m",
       "proxy_disabled": true,
     }
@@ -47,6 +47,6 @@ This configuration will set the _collection time_ to 2 minutes and will disable 
   or leave the defaults:
   ```
   "extra_config": {
-    github_com/devopsfaith/krakend-metrics": {}
+    "telemetry/metrics": {}
   }
   ```

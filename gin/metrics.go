@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/luraproject/lura/v2/config"
-	"github.com/luraproject/lura/v2/logging"
-	"github.com/luraproject/lura/v2/proxy"
-	krakendgin "github.com/luraproject/lura/v2/router/gin"
+	"github.com/luraproject/lura/v3/config"
+	"github.com/luraproject/lura/v3/logging"
+	"github.com/luraproject/lura/v3/proxy"
+	krakendgin "github.com/luraproject/lura/v3/router/gin"
 
-	metrics "github.com/krakend/krakend-metrics/v2"
-	"github.com/krakend/krakend-metrics/v2/mux"
+	metrics "github.com/krakend/krakend-metrics/v3"
+	"github.com/krakend/krakend-metrics/v3/mux"
 )
 
 // New creates a new metrics producer with support for the gin router
