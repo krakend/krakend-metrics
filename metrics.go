@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/luraproject/lura/v2/config"
-	"github.com/luraproject/lura/v2/logging"
+	"github.com/luraproject/lura/v3/config"
+	"github.com/luraproject/lura/v3/logging"
 	"github.com/rcrowley/go-metrics"
 )
 
@@ -50,7 +50,7 @@ func New(ctx context.Context, e config.ExtraConfig, l logging.Logger) *Metrics {
 }
 
 // Namespace is the key to look for extra configuration details
-const Namespace = "github_com/devopsfaith/krakend-metrics"
+const Namespace = "telemetry/metrics"
 
 // Config holds if a component is active or not
 type Config struct {
@@ -149,7 +149,7 @@ func (m *Metrics) TakeSnapshot() Stats {
 }
 
 func (m *Metrics) processMetrics(ctx context.Context, d time.Duration, _ metrics.Logger) {
-	r := metrics.NewPrefixedChildRegistry(*(m.Registry), "service.")
+	r := metrics.NewPrefixedChildRegistry(*m.Registry, "service.")
 
 	metrics.RegisterDebugGCStats(r)
 	metrics.RegisterRuntimeMemStats(r)

@@ -1,14 +1,15 @@
 {
+    "$schema": "https://krakend.io/schema/krakend.json",
     "version": 3,
     "name": "My lovely gateway",
     "port": 8080,
-    "cache_ttl": 3600,
+    "cache_ttl": "3600s",
     "timeout": "3s",
     "extra_config": {
-      "github_com/devopsfaith/krakend-metrics": {
-        "collection_time": "30s",
-        "listen_address": "127.0.0.1:8090"
-      }
+        "telemetry/metrics": {
+            "collection_time": "30s",
+            "listen_address": ":8090"
+        }
     },
     "endpoints": [
         {
