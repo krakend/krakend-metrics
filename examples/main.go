@@ -7,16 +7,15 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	koanf "github.com/krakend/krakend-koanf"
-	"github.com/luraproject/lura/v2/config"
-	"github.com/luraproject/lura/v2/logging"
-	"github.com/luraproject/lura/v2/proxy"
-	krakendgin "github.com/luraproject/lura/v2/router/gin"
-	"github.com/luraproject/lura/v2/router/gorilla"
-	"github.com/luraproject/lura/v2/router/mux"
+	"github.com/luraproject/lura/v3/config"
+	"github.com/luraproject/lura/v3/logging"
+	"github.com/luraproject/lura/v3/proxy"
+	krakendgin "github.com/luraproject/lura/v3/router/gin"
+	"github.com/luraproject/lura/v3/router/gorilla"
+	"github.com/luraproject/lura/v3/router/mux"
 
-	metricsgin "github.com/krakend/krakend-metrics/v2/gin"
-	metricsmux "github.com/krakend/krakend-metrics/v2/mux"
+	metricsgin "github.com/krakend/krakend-metrics/v3/gin"
+	metricsmux "github.com/krakend/krakend-metrics/v3/mux"
 )
 
 func main() {
@@ -30,8 +29,8 @@ func main() {
 	if *useGorilla {
 		config.RoutingPattern = config.BracketsRouterPatternBuilder
 	}
-	parser := koanf.New()
-	serviceConfig, err := parser.Parse(*configFile)
+
+	serviceConfig, err := config.NewParser().Parse(*configFile)
 	if err != nil {
 		log.Fatal("ERROR:", err.Error())
 	}

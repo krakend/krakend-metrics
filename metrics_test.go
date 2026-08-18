@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/luraproject/lura/v2/logging"
+	"github.com/luraproject/lura/v3/logging"
 	"github.com/rcrowley/go-metrics"
 )
 
@@ -168,5 +168,5 @@ type customLogger struct {
 }
 
 func (l customLogger) Printf(_ string, _ ...interface{}) {
-	*(l.called) = true
+	*l.called = true
 }

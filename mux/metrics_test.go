@@ -14,11 +14,11 @@ import (
 	"testing"
 	"time"
 
-	krakendmetrics "github.com/krakend/krakend-metrics/v2"
-	"github.com/luraproject/lura/v2/config"
-	"github.com/luraproject/lura/v2/logging"
-	"github.com/luraproject/lura/v2/proxy"
-	"github.com/luraproject/lura/v2/router/mux"
+	krakendmetrics "github.com/krakend/krakend-metrics/v3"
+	"github.com/luraproject/lura/v3/config"
+	"github.com/luraproject/lura/v3/logging"
+	"github.com/luraproject/lura/v3/proxy"
+	"github.com/luraproject/lura/v3/router/mux"
 	metrics "github.com/rcrowley/go-metrics"
 )
 
